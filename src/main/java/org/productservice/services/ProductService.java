@@ -4,4 +4,5 @@ import org.productservice.dtos.GenericProductDto;
 
 public interface ProductService {
     GenericProductDto getProductById(Long id);
+    GenericProductDto createProduct(GenericProductDto product);
 }

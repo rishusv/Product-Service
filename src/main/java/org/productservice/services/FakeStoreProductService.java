@@ -14,9 +14,16 @@ import org.springframework.web.client.RestTemplate;
 public class FakeStoreProductService implements ProductService{
     private RestTemplateBuilder restTemplateBuilder;
     private String getProductRequestURL = "https://fakestoreapi.com/products/{id}";
+    private String createProductRequestURL = "https://fakestoreapi.com/products";
 
     public FakeStoreProductService(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplateBuilder = restTemplateBuilder;
+    }
+    public GenericProductDto createProduct(GenericProductDto product){
+        RestTemplate restTemplate = restTemplateBuilder.build();
+        ResponseEntity<GenericProductDto> response = restTemplate.postForEntity(createProductRequestURL,
+                product, GenericProductDto.class);
+        return response.getBody();
     }
     @Override
     public GenericProductDto getProductById(Long id) {
