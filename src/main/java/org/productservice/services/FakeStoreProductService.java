@@ -1,39 +1,24 @@
 package org.productservice.services;
 
-import org.productservice.dtos.FakeStoreProductDto;
 import org.productservice.dtos.GenericProductDto;
 import org.productservice.exception.NotFoundException;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.productservice.thirdPartyClients.productservice.fakeStore.FakeStoreProductDto;
+import org.productservice.thirdPartyClients.productservice.fakeStore.FakeStoreProductServiceClient;
 import org.springframework.context.annotation.Primary;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RequestCallback;
-import org.springframework.web.client.ResponseExtractor;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
 @Primary
-public class FakeStoreProductService implements ProductService{
-    private RestTemplateBuilder restTemplateBuilder;
-    private String specificProductRequestURL = "https://fakestoreapi.com/products/{id}";
-    private String createProductRequestURL = "https://fakestoreapi.com/products";
-    private String productRequestBaseURL = "https://fakestoreapi.com/products";
+public class FakeStoreProductService implements ProductService {
 
-    public FakeStoreProductService(RestTemplateBuilder restTemplateBuilder) {
-        this.restTemplateBuilder = restTemplateBuilder;
-    }
-    public GenericProductDto createProduct(GenericProductDto product){
-        RestTemplate restTemplate = restTemplateBuilder.build();
-        ResponseEntity<GenericProductDto> response = restTemplate.postForEntity(createProductRequestURL,
-                product, GenericProductDto.class);
-        return response.getBody();
-    }
+    private FakeStoreProductServiceClient fakeStoreProductServiceClient;
 
+    public FakeStoreProductService(FakeStoreProductServiceClient fakeStoreProductServiceClient) {
+        this.fakeStoreProductServiceClient = fakeStoreProductServiceClient;
+    }
     private GenericProductDto convertFakeStoreDtoIntoGenericProductDto (FakeStoreProductDto fakeStoreProductDto){
         GenericProductDto product = new GenericProductDto();
         product.setId(fakeStoreProductDto.getId());
@@ -45,49 +30,26 @@ public class FakeStoreProductService implements ProductService{
         return product;
     }
 
+    public GenericProductDto createProduct(GenericProductDto product) {
+        return convertFakeStoreDtoIntoGenericProductDto(fakeStoreProductServiceClient.createProduct(product));
+    }
+
     @Override
     public List<GenericProductDto> getAllProducts() {
-        RestTemplate restTemplate = restTemplateBuilder.build();
-        ResponseEntity<FakeStoreProductDto[]> response =
-                restTemplate.getForEntity(productRequestBaseURL,
-                         FakeStoreProductDto[].class );
-
-        List<GenericProductDto> answer = new ArrayList<>();
-
-        for(FakeStoreProductDto fakeStoreProductDto : Arrays.stream(response.getBody()).toList()) {
-
-            answer.add(convertFakeStoreDtoIntoGenericProductDto(fakeStoreProductDto));
+        List<GenericProductDto> genericProductDtos = new ArrayList<>();
+        for(FakeStoreProductDto fakeStoreProductDto : fakeStoreProductServiceClient.getAllProducts()){
+            genericProductDtos.add(convertFakeStoreDtoIntoGenericProductDto(fakeStoreProductDto));
         }
-
-        return answer;
+        return genericProductDtos;
     }
 
     @Override
     public GenericProductDto deleteProductById(Long id) {
-        RestTemplate restTemplate = restTemplateBuilder.build();
-
-        RequestCallback requestCallback = restTemplate.acceptHeaderRequestCallback(FakeStoreProductDto.class);
-        ResponseExtractor<ResponseEntity<FakeStoreProductDto>> responseExtractor = restTemplate.responseEntityExtractor(FakeStoreProductDto.class);
-        ResponseEntity<FakeStoreProductDto> response = restTemplate.execute(specificProductRequestURL, HttpMethod.DELETE, requestCallback, responseExtractor, id);
-
-        FakeStoreProductDto fakeStoreProductDto = response.getBody();
-
-        return convertFakeStoreDtoIntoGenericProductDto(fakeStoreProductDto);
+        return convertFakeStoreDtoIntoGenericProductDto(fakeStoreProductServiceClient.deleteProductById(id));
     }
 
     @Override
     public GenericProductDto getProductById(Long id) throws NotFoundException {
-        RestTemplate restTemplate =restTemplateBuilder.build();
-        ResponseEntity<FakeStoreProductDto> response =
-                restTemplate.getForEntity(specificProductRequestURL
-                                , FakeStoreProductDto.class,id);
-
-        FakeStoreProductDto fakeStoreProductDto = response.getBody();
-
-        if(fakeStoreProductDto == null){
-            throw new NotFoundException("Product with id :"+id+ " doesn't exist");
-        }
-
-        return convertFakeStoreDtoIntoGenericProductDto(fakeStoreProductDto);
+        return convertFakeStoreDtoIntoGenericProductDto(fakeStoreProductServiceClient.getProductById(id));
     }
 }
