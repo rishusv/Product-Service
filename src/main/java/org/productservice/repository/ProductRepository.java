@@ -23,9 +23,8 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             nativeQuery = true)
     Product findByTitle(String title);
 
-    @Query("select Product from Product where Product.title= :rishu")
-        //hibernate Query , checked at compile time
-    List<Product> readAllByTitle(String rishu); //hibernate query -> independent of DB
+//    @Query("select Product from Product where Product.title= :rishu") //hibernate Query , checked at compile time
+//    List<Product> readAllByTitle(String rishu); //hibernate query -> independent of DB
 
     List<Product> findAllByCategoryIn(List<Category> categories);
 }

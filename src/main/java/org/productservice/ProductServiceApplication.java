@@ -11,38 +11,39 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ProductServiceApplication implements CommandLineRunner {
-    ProductRepository productRepository;
-    private final CategoryRepository categoryRepository;
-    private final PriceRepository priceRepository;
-
-    public ProductServiceApplication(ProductRepository productRepository,
-                                     CategoryRepository categoryRepository,
-                                     PriceRepository priceRepository) {
-        this.productRepository = productRepository;
-        this.categoryRepository = categoryRepository;
-        this.priceRepository = priceRepository;
-    }
+public class ProductServiceApplication {
+//        implements CommandLineRunner {
+//    ProductRepository productRepository;
+//    private final CategoryRepository categoryRepository;
+//    private final PriceRepository priceRepository;
+//
+//    public ProductServiceApplication(ProductRepository productRepository,
+//                                     CategoryRepository categoryRepository,
+//                                     PriceRepository priceRepository) {
+//        this.productRepository = productRepository;
+//        this.categoryRepository = categoryRepository;
+//        this.priceRepository = priceRepository;
+//    }
     public static void main(String[] args) {
         SpringApplication.run(ProductServiceApplication.class, args);
     }
 
-    @Override
-    public void run(String... args) throws Exception {
-        Category category=new Category();
-        category.setName("Apple Devices");
-        Category savedCategory = categoryRepository.save(category);
-
-        Price price = new Price();
-        Price savedPrice = priceRepository.save(price);
-
-        Product product =new Product();
-        product.setDescription("iPhone");
-//        product.setPrice(200000);
-        product.setTitle("16");
-        product.setCategory(savedCategory);
-        product.setPrice(savedPrice);
-
-        productRepository.save(product);
-    }
+//    @Override
+//    public void run(String... args) throws Exception {
+//        Category category=new Category();
+//        category.setName("Apple Devices");
+//        Category savedCategory = categoryRepository.save(category);
+//
+//        Price price = new Price();
+//        Price savedPrice = priceRepository.save(price);
+//
+//        Product product =new Product();
+//        product.setDescription("iPhone");
+////        product.setPrice(200000);
+//        product.setTitle("16");
+//        product.setCategory(savedCategory);
+//        product.setPrice(savedPrice);
+//
+//        productRepository.save(product);
+//    }
 }
