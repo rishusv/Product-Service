@@ -4,6 +4,9 @@ import org.apache.logging.log4j.message.StringFormattedMessage;
 import org.productservice.models.Category;
 import org.productservice.models.Product;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.FluentQuery;
@@ -27,4 +30,8 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 //    List<Product> readAllByTitle(String rishu); //hibernate query -> independent of DB
 
     List<Product> findAllByCategoryIn(List<Category> categories);
+
+    List<Product> findByTitleContaining(String query);
+
+    Page<Product> findAllByTitleContainingAndCategory_Id(String query, Long categoryId, Pageable pageable);
 }

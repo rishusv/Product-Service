@@ -3,6 +3,8 @@ package org.productservice.controller;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.productservice.dtos.GenericProductDto;
 import org.productservice.exception.NotFoundException;
 import org.productservice.services.ProductService;
@@ -14,6 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -28,6 +31,13 @@ public class ProductControllerTest {
     @MockBean
     @Autowired
     private ProductService productService;
+
+
+    @Captor
+    private ArgumentCaptor<Long> idCaptor;
+
+    @Captor
+    private ArgumentCaptor<Long> fakeStoreCaptor;
 
     @Test
     void returnsNullWhenProductDoesntExist() throws NotFoundException {
@@ -66,6 +76,30 @@ public class ProductControllerTest {
     @Test
     void additionToBeTrue() {
         assert -1 + 1 == 0;
+    }
+
+    @Test
+    void productControllerCallsProductServiceWithSameProductId() throws NotFoundException {
+        Long id = 1L;
+
+        when(fakeStoreProductServiceClient.getProductById(any()))
+                .thenCallRealMethod();
+        when(productService.getProductById(any()))
+                .thenCallRealMethod();
+
+
+//        when(fakeStoreProductService.getProductById(any()))
+//                .thenCallRealMethod();
+
+        // check that the product service is being called with the exact same
+        // param as controller
+
+        productController.getProductById(id);
+
+        verify(productService).getProductById(idCaptor.capture());
+        verify(fakeStoreProductServiceClient).getProductById(fakeStoreCaptor.capture());
+        assertEquals(id, idCaptor.getValue());
+        assertEquals(id, fakeStoreCaptor.getValue());
     }
 }
 
