@@ -33,5 +33,5 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     List<Product> findByTitleContaining(String query);
 
-    Page<Product> findAllByTitleContainingAndCategory_Id(String query, Long categoryId, Pageable pageable);
+//    Page<Product> findAllByTitleContainingAndCategory_Id(String query, Long categoryId, Pageable pageable);
 }

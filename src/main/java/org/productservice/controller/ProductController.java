@@ -7,6 +7,7 @@ import org.productservice.services.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +16,11 @@ import java.util.List;
 @RequestMapping("/api/v1/products")
 public class ProductController {
     ProductService productService;
-    public ProductController(ProductService productService) {
+    private RestTemplate restTemplate;
+    public ProductController(ProductService productService,
+                             RestTemplate restTemplate) {
         this.productService = productService;
+        this.restTemplate =  restTemplate;
     }
 
 //    @GetMapping()
@@ -64,8 +68,17 @@ public class ProductController {
                  );
     }
     @PostMapping()
-    public GenericProductDto createProduct(@RequestBody GenericProductDto product) {
+    public GenericProductDto createProduct(@RequestHeader("Authorization") String token,@RequestBody GenericProductDto product) {
+        Boolean isAuthenticated = restTemplate.getForObject(
+                "http://userservice/api/v1/auth/validate?token=" + token,
+                Boolean.class);
+
+        if(!isAuthenticated){
+            return null;
+        }
+
         return productService.createProduct(product);
+
 //        return "New Product "+ UUID.randomUUID();
     }
 //
